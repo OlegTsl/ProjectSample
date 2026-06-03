@@ -11,6 +11,10 @@ Context::Context() {
     _freeEntityIds.reserve(MAX_POOL_SIZE);
 }
 
+void Context::onDestroy(DestroyCallback callback) {
+    _destroyCallbacks.push_back(std::move(callback));
+}
+
 Entity Context::allocateEntity() {
     Entity entity;
     
@@ -33,6 +37,10 @@ Entity Context::allocateEntity() {
 
 void Context::destroyEntity(Entity entity) {
     assert(isAlive(entity));
+
+    for (auto& callback : _destroyCallbacks) {
+        callback(entity);
+    }
     
     auto& [componentMask, generation] = _entityRecords[entity.id];
     for (size_t bit = 0; bit < MAX_COMPONENTS; ++bit) {

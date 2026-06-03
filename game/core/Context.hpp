@@ -6,6 +6,8 @@
 #include <typeindex>
 #include <bitset>
 #include <cassert>
+#include <functional>
+
 #include "Entity.hpp"
 #include "ComponentPool.hpp"
 
@@ -22,6 +24,9 @@ public:
     Context& operator=(const Context&) = delete;
     Context(Context&&)                 = default;
     Context& operator=(Context&&)      = default;
+
+    using DestroyCallback = std::function<void(Entity)>;
+    void onDestroy(DestroyCallback callback);
     
     template<typename... Components>
     Entity createEntity(Components&&... components) {
@@ -136,6 +141,7 @@ private:
     std::unordered_map<size_t, std::type_index>                             _bitToType;
     std::vector<EntityRecord>                                               _entityRecords;
     std::vector<uint32_t>                                                   _freeEntityIds;
+    std::vector<DestroyCallback>                                            _destroyCallbacks;
     size_t                                                                  _entityCount      = 0;
     size_t                                                                  _nextComponentBit = 0;
     

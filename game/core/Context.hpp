@@ -2,8 +2,6 @@
 
 #include <vector>
 #include <memory>
-#include <unordered_map>
-#include <typeindex>
 #include <bitset>
 #include <cassert>
 #include <functional>
@@ -12,6 +10,17 @@
 #include "ComponentPool.hpp"
 
 namespace game::core {
+
+inline size_t& componentIdCounter() {
+    static size_t counter = 0;
+    return counter;
+}
+
+template<typename T>
+size_t componentId() {
+    static size_t id = componentIdCounter()++;
+    return id;
+}
 
 class Context {
 public:
@@ -40,22 +49,21 @@ public:
     
     template<typename T>
     T* getComponent(Entity entity) {
-        auto* pool = getPool<T>();
-        if (!pool)
+        size_t id = componentId<T>();
+        if (id >= _pools.size() || !_pools[id])
             return nullptr;
-        
-        return pool->get(entity);
+
+        auto* wrapper = static_cast<PoolWrapper<T>*>(_pools[id].get());
+        return wrapper->pool.get(entity);
     }
     
     template<typename T>
     const T* getComponent(Entity entity) const {
-        auto typeIdx = std::type_index(typeid(T));
-        auto it      = _pools.find(typeIdx);
-
-        if (it == _pools.end())
+        size_t id = componentId<T>();
+        if (id >= _pools.size() || !_pools[id])
             return nullptr;
-        
-        auto* wrapper = static_cast<const PoolWrapper<T>*>(it->second.get());
+
+        auto* wrapper = static_cast<const PoolWrapper<T>*>(_pools[id].get());
         return wrapper->pool.get(entity);
     }
     
@@ -64,7 +72,7 @@ public:
         if (!isAlive(entity))
             return false;
         
-        size_t bit = const_cast<Context*>(this)->getComponentBit<T>();
+        size_t bit = componentId<T>();
         return _entityRecords[entity.id].componentMask.test(bit);
     }
     
@@ -77,43 +85,25 @@ public:
             *existing   = std::forward<T>(component);
             return existing;
         }
-        
-        pool->add(entity, std::forward<T>(component));
-        
-        size_t bit = getComponentBit<T>();
+
+        size_t bit = componentId<T>();
         _entityRecords[entity.id].componentMask.set(bit);
         
-        return pool->get(entity);
+        return pool->add(entity, std::forward<T>(component));
     }
     
     template<typename T>
     void removeComponent(Entity entity) {
-        auto* pool = getPool<T>();
-        if (!pool || !pool->has(entity))
-            return;
-        
+        size_t id = componentId<T>();
+        if (id >= _pools.size() || !_pools[id]) return;
+
+        auto* pool = &static_cast<PoolWrapper<T>*>(_pools[id].get())->pool;
+        if (!pool->has(entity)) return;
+
         pool->remove(entity);
-
-        size_t bit = getComponentBit<T>();
-        _entityRecords[entity.id].componentMask.reset(bit);
+        _entityRecords[entity.id].componentMask.reset(id);
     }
-    
-    template<typename T>
-    ComponentPool<T>* getPool() {
-        auto typeIdx = std::type_index(typeid(T));
-        auto it      = _pools.find(typeIdx);
 
-        if (it != _pools.end()) {
-            return &static_cast<PoolWrapper<T>*>(it->second.get())->pool;
-        }
-        
-        auto wrapper = std::make_unique<PoolWrapper<T>>();
-        auto* ptr    = &wrapper->pool;
-
-        _pools[typeIdx] = std::move(wrapper);
-        return ptr;
-    }
-    
     size_t getEntityCount() const;
     
 private:
@@ -136,34 +126,25 @@ private:
         }
     };
 
-    mutable std::unordered_map<std::type_index, std::unique_ptr<IPoolBase>> _pools;
-    std::unordered_map<std::type_index, size_t>                             _componentBits;
-    std::unordered_map<size_t, std::type_index>                             _bitToType;
-    std::vector<EntityRecord>                                               _entityRecords;
-    std::vector<uint32_t>                                                   _freeEntityIds;
-    std::vector<DestroyCallback>                                            _destroyCallbacks;
-    size_t                                                                  _entityCount      = 0;
-    size_t                                                                  _nextComponentBit = 0;
+    template<typename T>
+    ComponentPool<T>* getPool() {
+        size_t id = componentId<T>();
+        if (id >= _pools.size()) {
+            _pools.resize(id + 1);
+        }
+        if (!_pools[id]) {
+            _pools[id] = std::make_unique<PoolWrapper<T>>();
+        }
+        return &static_cast<PoolWrapper<T>*>(_pools[id].get())->pool;
+    }
+
+    std::vector<std::unique_ptr<IPoolBase>> _pools;
+    std::vector<EntityRecord>               _entityRecords;
+    std::vector<uint32_t>                   _freeEntityIds;
+    std::vector<DestroyCallback>            _destroyCallbacks;
+    size_t                                  _entityCount = 0;
     
     Entity allocateEntity();
-    
-    template<typename T>
-    size_t getComponentBit() {
-        auto typeIdx = std::type_index(typeid(T));
-        auto it      = _componentBits.find(typeIdx);
-
-        if (it != _componentBits.end()) {
-            return it->second;
-        }
-        
-        assert(_nextComponentBit < MAX_COMPONENTS);
-
-        size_t bit              = _nextComponentBit++;
-        _componentBits[typeIdx] = bit;
-        _bitToType.emplace(bit, typeIdx);
-
-        return bit;
-    }
 };
 
 } // namespace game::core

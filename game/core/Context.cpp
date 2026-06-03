@@ -43,15 +43,13 @@ void Context::destroyEntity(Entity entity) {
     }
     
     auto& [componentMask, generation] = _entityRecords[entity.id];
-    for (size_t bit = 0; bit < MAX_COMPONENTS; ++bit) {
-        if (!componentMask.test(bit)) {
-            continue;
-        }
 
-        if (auto it = _bitToType.find(bit); it != _bitToType.end()) {
-            if (auto poolIt = _pools.find(it->second); poolIt != _pools.end()) {
-                poolIt->second->removeFromEntity(entity);
-            }
+    for (size_t bit = 0; bit < MAX_COMPONENTS; ++bit) {
+        if (!componentMask.test(bit))
+            continue;
+
+        if (bit < _pools.size() && _pools[bit]) {
+            _pools[bit]->removeFromEntity(entity);
         }
     }
     
@@ -63,8 +61,11 @@ void Context::destroyEntity(Entity entity) {
 }
 
 bool Context::isAlive(Entity entity) const {
-    return (entity.id >= _entityRecords.size()) ? false :
-        (_entityRecords[entity.id].generation == entity.generation) && (entity.generation > 0);
+    if (entity.id >= _entityRecords.size())
+        return false;
+
+    return _entityRecords[entity.id].generation == entity.generation
+        && entity.generation > 0;
 }
 
 size_t Context::getEntityCount() const {

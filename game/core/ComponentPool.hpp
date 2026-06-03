@@ -10,13 +10,15 @@ namespace game::core {
 template<typename T>
 class ComponentPool {
 public:
-    void add(Entity entity, T&& component) {
+    T* add(Entity entity, T&& component) {
         assert(!has(entity));
         
         size_t index = _data.size();
         _data.push_back(std::forward<T>(component));
         _entities.push_back(entity);
         _entityToIndex[entity.id] = index;
+
+        return &_data.back();
     }
     
     void remove(Entity entity) {

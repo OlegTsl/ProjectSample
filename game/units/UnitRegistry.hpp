@@ -6,7 +6,6 @@
 
 #include "game/core/Entity.hpp"
 #include "game/units/Unit.hpp"
-#include "game/components/Identity.hpp"
 
 namespace game {
 
@@ -20,18 +19,16 @@ namespace game {
 
         Unit* getUnit(core::Entity entity) const;
 
-        const std::vector<Unit*>& getAll()                               const;
-        const std::vector<Unit*>& getByType (components::UnitClass type) const;
-        const std::vector<Unit*>& getByTeam (int team)                   const;
-        std::vector<Unit*> getEnemies(int team)                          const;
+        const std::vector<Unit*>& getAll()             const;
+        const std::vector<Unit*>& getByTeam (int team) const;
+        std::vector<Unit*> getEnemies(int team)        const;
 
     private:
         std::vector<std::unique_ptr<Unit>>  _units;
         std::unordered_map<uint32_t, Unit*> _entityToUnit;
 
-        std::vector<Unit*>                                            _all;
-        std::unordered_map<components::UnitClass, std::vector<Unit*>> _typed;
-        std::unordered_map<int, std::vector<Unit*>>                   _teamed;
+        std::vector<Unit*>                          _all;
+        std::unordered_map<int, std::vector<Unit*>> _teamed;
 
         void addToIndices     (Unit* unit);
         void removeFromIndices(Unit* unit);

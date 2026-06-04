@@ -49,17 +49,8 @@ namespace game {
         return _ctx.getComponent<components::Team>(_entity);
     }
 
-    components::UnitType* Unit::type() {
-        return _ctx.getComponent<components::UnitType>(_entity);
-    }
-
     bool Unit::isAlive() const {
         return _ctx.isAlive(_entity);
-    }
-
-    components::UnitClass Unit::getType() const {
-        auto* type = _ctx.getComponent<components::UnitType>(_entity);
-        return type ? type->type : components::UnitClass::Warrior;
     }
 
     int Unit::getTeam() const {

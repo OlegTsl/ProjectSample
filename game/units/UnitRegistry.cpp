@@ -36,12 +36,6 @@ namespace game {
         return _all;
     }
 
-    const std::vector<Unit*>& UnitRegistry::getByType(components::UnitClass type) const {
-        static std::vector<Unit*> empty;
-        auto it = _typed.find(type);
-        return it != _typed.end() ? it->second : empty;
-    }
-
     const std::vector<Unit*>& UnitRegistry::getByTeam(int team) const {
         static std::vector<Unit*> empty;
         auto it = _teamed.find(team);
@@ -60,7 +54,6 @@ namespace game {
 
     void UnitRegistry::addToIndices(Unit* unit) {
         _all.push_back(unit);
-        _typed[unit->getType()].push_back(unit);
         _teamed[unit->getTeam()].push_back(unit);
     }
 
@@ -74,9 +67,6 @@ namespace game {
         };
 
         swapAndPop(_all, unit);
-
-        if (auto it = _typed.find(unit->getType()); it != _typed.end())
-            swapAndPop(it->second, unit);
 
         if (auto it = _teamed.find(unit->getTeam()); it != _teamed.end())
             swapAndPop(it->second, unit);

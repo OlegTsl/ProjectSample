@@ -17,7 +17,6 @@ namespace game {
 
     Unit* UnitFactory::createWarrior(tools::Vec2 pos, int team) {
         auto entity = _context.createEntity(
-            components::UnitType  {components::UnitClass::Warrior},
             components::Name      {"Aragorn"},
             components::Team      {team},
             components::Health    {120, 120},
@@ -31,7 +30,6 @@ namespace game {
 
     Unit* UnitFactory::createArcher(tools::Vec2 pos, int team) {
         auto entity = _context.createEntity(
-            components::UnitType   {components::UnitClass::Archer},
             components::Name       {"Legolas"},
             components::Team       {team},
             components::Health     {80, 80},
@@ -46,7 +44,6 @@ namespace game {
 
     Unit* UnitFactory::createMage(tools::Vec2 pos, int team) {
         auto entity = _context.createEntity(
-            components::UnitType   {components::UnitClass::Mage},
             components::Name       {"Gendalf"},
             components::Team       {team},
             components::Health     {60, 60},

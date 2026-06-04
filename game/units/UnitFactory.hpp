@@ -1,7 +1,8 @@
 #pragma once
 
-#include "core/Context.hpp"
 #include "UnitRegistry.hpp"
+#include "game/tools/Vec2.hpp"
+#include "game/core/Context.hpp"
 
 namespace game {
     class Unit;
@@ -9,9 +10,9 @@ namespace game {
     public:
         UnitFactory(core::Context& context, UnitRegistry& registry);
 
-        Unit* createWarrior(int x, int y, int team);
-        Unit* createArcher (int x, int y, int team);
-        Unit* createMage   (int x, int y, int team);
+        Unit* createWarrior(tools::Vec2 pos, int team);
+        Unit* createArcher (tools::Vec2 pos, int team);
+        Unit* createMage   (tools::Vec2 pos, int team);
 
     private:
         Unit* registerUnit(core::Entity& entity);

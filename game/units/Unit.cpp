@@ -17,10 +17,6 @@ namespace game {
         return _entity;
     }
 
-    components::UnitType* Unit::unitType() {
-        return _ctx.getComponent<components::UnitType>(_entity);
-    }
-
     components::Health* Unit::health() {
         return _ctx.getComponent<components::Health>(_entity);
     }
@@ -41,8 +37,8 @@ namespace game {
         return _ctx.getComponent<components::Intellect>(_entity);
     }
 
-    components::Damage* Unit::damage() {
-        return _ctx.getComponent<components::Damage>(_entity);
+    components::BaseDamage* Unit::baseDamage() {
+        return _ctx.getComponent<components::BaseDamage>(_entity);
     }
 
     components::Position* Unit::position() {
@@ -67,7 +63,7 @@ namespace game {
     }
 
     int Unit::getTeam() const {
-        auto* team = const_cast<Unit*>(this)->team();
+        auto* team = _ctx.getComponent<components::Team>(_entity);
         return team ? team->value : 0;
     }
 }

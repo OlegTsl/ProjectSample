@@ -6,7 +6,7 @@ namespace game::core
 {
     struct Entity
     {
-        uint32_t id = 0;
+        uint32_t id         = 0;
         uint32_t generation = 0;
         
         bool operator==(const Entity& other) const {

@@ -2,6 +2,7 @@
 #include "Unit.hpp"
 
 namespace game {
+
     void UnitRegistry::registerUnit(std::unique_ptr<Unit> unit) {
         Unit* ptr = unit.get();
         _units.push_back(std::move(unit));
@@ -18,9 +19,11 @@ namespace game {
         _entityToUnit.erase(it);
 
         auto unitIt = std::find_if(_units.begin(), _units.end(),
-            [unit](const auto& u) { return u.get() == unit; });
+        [unit](const auto& u) { return u.get() == unit; });
+
         if (unitIt != _units.end()) {
-            _units.erase(unitIt);
+            std::iter_swap(unitIt, _units.end() - 1);
+            _units.pop_back();
         }
     }
 
@@ -45,16 +48,13 @@ namespace game {
         return it != _teamed.end() ? it->second : empty;
     }
 
-    const std::vector<Unit*>& UnitRegistry::getEnemies(int team) const {
-        static std::vector<Unit*> enemies;
-        enemies.clear();
-
+    std::vector<Unit*> UnitRegistry::getEnemies(int team) const {
+        std::vector<Unit*> enemies;
         for (auto& [t, units] : _teamed) {
             if (t != team) {
                 enemies.insert(enemies.end(), units.begin(), units.end());
             }
         }
-
         return enemies;
     }
 
@@ -65,18 +65,21 @@ namespace game {
     }
 
     void UnitRegistry::removeFromIndices(Unit* unit) {
-        _all.erase(std::remove(_all.begin(), _all.end(), unit), _all.end());
+        auto swapAndPop = [](std::vector<Unit*>& vec, Unit* u) {
+            auto it = std::find(vec.begin(), vec.end(), u);
+            if (it != vec.end()) {
+                std::iter_swap(it, vec.end() - 1);
+                vec.pop_back();
+            }
+        };
 
-        auto typeIt = _typed.find(unit->getType());
-        if (typeIt != _typed.end()) {
-            auto& vec = typeIt->second;
-            vec.erase(std::remove(vec.begin(), vec.end(), unit), vec.end());
-        }
+        swapAndPop(_all, unit);
 
-        auto teamIt = _teamed.find(unit->getTeam());
-        if (teamIt != _teamed.end()) {
-            auto& vec = teamIt->second;
-            vec.erase(std::remove(vec.begin(), vec.end(), unit), vec.end());
-        }
+        if (auto it = _typed.find(unit->getType()); it != _typed.end())
+            swapAndPop(it->second, unit);
+
+        if (auto it = _teamed.find(unit->getTeam()); it != _teamed.end())
+            swapAndPop(it->second, unit);
     }
+
 } // namespace game

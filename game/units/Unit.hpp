@@ -10,7 +10,7 @@ namespace game::components {
     struct Strength;
     struct Agility;
     struct Intellect;
-    struct Damage;
+    struct BaseDamage;
     struct Position;
     struct Team;
     struct UnitType;
@@ -23,13 +23,12 @@ namespace game {
 
         core::Entity getEntity() const;
 
-        components::UnitType*    unitType();
         components::Health*      health();
         components::Mana*        mana();
         components::Strength*    strength();
         components::Agility*     agility();
         components::Intellect*   intellect();
-        components::Damage*      damage();
+        components::BaseDamage*  baseDamage();
         components::Position*    position();
         components::Team*        team();
         components::UnitType*    type();

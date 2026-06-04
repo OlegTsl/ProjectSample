@@ -15,45 +15,46 @@ namespace game {
         });
     }
 
-    Unit* UnitFactory::createWarrior(int x, int y, int team) {
+    Unit* UnitFactory::createWarrior(tools::Vec2 pos, int team) {
         auto entity = _context.createEntity(
-            components::UnitClass::Warrior,
-            components::Team     {team},
-            components::Health   {120, 120},
-            components::Strength {15},
-            components::Agility  {5},
-            components::Intellect{2},
-            components::Damage   {12},
-            components::Position {x, y});
+            components::UnitType  {components::UnitClass::Warrior},
+            components::Name      {"Aragorn"},
+            components::Team      {team},
+            components::Health    {120, 120},
+            components::Strength  {10},
+            components::BaseDamage{12},
+            components::Position  {pos }
+        );
 
         return registerUnit(entity);
     }
 
-    Unit* UnitFactory::createArcher(int x, int y, int team) {
+    Unit* UnitFactory::createArcher(tools::Vec2 pos, int team) {
         auto entity = _context.createEntity(
-            components::UnitClass::Archer,
-            components::Team{team},
-            components::Health{80, 80},
-            components::Strength{8},
-            components::Agility{20},
-            components::Intellect{4},
-            components::Damage{15},
-            components::Position{x, y});
+            components::UnitType   {components::UnitClass::Archer},
+            components::Name       {"Legolas"},
+            components::Team       {team},
+            components::Health     {80, 80},
+            components::Agility    {15},
+            components::BaseDamage {15},
+            components::AttackRange{4},
+            components::Position   {pos }
+        );
 
         return registerUnit(entity);
     }
 
-    Unit* UnitFactory::createMage(int x, int y, int team) {
+    Unit* UnitFactory::createMage(tools::Vec2 pos, int team) {
         auto entity = _context.createEntity(
-            components::UnitClass::Mage,
-            components::Team{team},
-            components::Health{60, 60},
-            components::Mana{100, 100},
-            components::Strength{3},
-            components::Agility{6},
-            components::Intellect{25},
-            components::Damage{30},
-            components::Position{x, y}
+            components::UnitType   {components::UnitClass::Mage},
+            components::Name       {"Gendalf"},
+            components::Team       {team},
+            components::Health     {60, 60},
+            components::Mana       {100, 100},
+            components::Intellect  {20},
+            components::BaseDamage {20},
+            components::AttackRange{3},
+            components::Position   {pos }
         );
 
         return registerUnit(entity);

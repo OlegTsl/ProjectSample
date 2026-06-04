@@ -9,13 +9,13 @@ namespace game::core {
     class InitializeSystem {
     public:
         virtual ~InitializeSystem() = default;
-        virtual void initialize(Context& ctx) = 0;
+        virtual void initialize(Context& context) = 0;
     };
 
     class UpdateSystem {
     public:
         virtual ~UpdateSystem() = default;
-        virtual void update(Context& ctx, float dt) = 0;
+        virtual void update(Context& context, float dt) = 0;
     };
 
     class SystemRegistry {
@@ -33,8 +33,8 @@ namespace game::core {
             (_updateSystems.push_back(std::move(systems)), ...);
         }
 
-        void initializeAll(Context& ctx);
-        void updateAll(Context& ctx, float dt);
+        void initializeAll(Context& context);
+        void updateAll(Context& context, float dt);
 
         void clear();
 

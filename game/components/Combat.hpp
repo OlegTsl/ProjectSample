@@ -2,6 +2,7 @@
 
 namespace game::components
 {
-    struct Damage { int value; };
-    struct Range  { int value; };
+    struct BaseDamage  { int value; };
+    struct AttackRange { int value; };
+    struct Target      { core::Entity entity; };
 }

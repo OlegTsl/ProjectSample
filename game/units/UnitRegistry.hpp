@@ -4,12 +4,12 @@
 #include <unordered_map>
 #include <memory>
 
-#include "core/Entity.hpp"
-#include "components/Identity.hpp"
+#include "game/core/Entity.hpp"
+#include "game/units/Unit.hpp"
+#include "game/components/Identity.hpp"
 
 namespace game {
 
-    class Unit;
     class UnitRegistry {
     public:
         UnitRegistry()  = default;
@@ -23,7 +23,7 @@ namespace game {
         const std::vector<Unit*>& getAll()                               const;
         const std::vector<Unit*>& getByType (components::UnitClass type) const;
         const std::vector<Unit*>& getByTeam (int team)                   const;
-        const std::vector<Unit*>& getEnemies(int team)                   const;
+        std::vector<Unit*> getEnemies(int team)                          const;
 
     private:
         std::vector<std::unique_ptr<Unit>>  _units;
@@ -36,4 +36,5 @@ namespace game {
         void addToIndices     (Unit* unit);
         void removeFromIndices(Unit* unit);
     };
+
 } // namespace game

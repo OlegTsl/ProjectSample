@@ -104,6 +104,18 @@ public:
         _entityRecords[entity.id].componentMask.reset(id);
     }
 
+    template<typename T>
+    ComponentPool<T>* getPool() {
+        size_t id = componentId<T>();
+        if (id >= _pools.size()) {
+            _pools.resize(id + 1);
+        }
+        if (!_pools[id]) {
+            _pools[id] = std::make_unique<PoolWrapper<T>>();
+        }
+        return &static_cast<PoolWrapper<T>*>(_pools[id].get())->pool;
+    }
+
     size_t getEntityCount() const;
     
 private:
@@ -125,18 +137,6 @@ private:
             pool.remove(entity);
         }
     };
-
-    template<typename T>
-    ComponentPool<T>* getPool() {
-        size_t id = componentId<T>();
-        if (id >= _pools.size()) {
-            _pools.resize(id + 1);
-        }
-        if (!_pools[id]) {
-            _pools[id] = std::make_unique<PoolWrapper<T>>();
-        }
-        return &static_cast<PoolWrapper<T>*>(_pools[id].get())->pool;
-    }
 
     std::vector<std::unique_ptr<IPoolBase>> _pools;
     std::vector<EntityRecord>               _entityRecords;

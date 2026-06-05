@@ -1,8 +1,8 @@
 #pragma once
 
+#include "game/stats/Stats.hpp"
+
 namespace game::components
 {
-    struct Strength  { int value; };
-    struct Agility   { int value; };
-    struct Intellect { int value; };
+    struct BaseStats { stats::Stats stats; };
 }

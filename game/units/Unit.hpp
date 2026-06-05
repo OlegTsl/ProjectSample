@@ -1,8 +1,9 @@
 #pragma once
 
-#include "core/Entity.hpp"
-#include "core/Context.hpp"
-#include "components/Identity.hpp"
+#include "game/core/Entity.hpp"
+#include "game/core/Context.hpp"
+#include "game/components/Attributes.hpp"
+#include "game/components/Identity.hpp"
 
 namespace game::components {
     struct Health;
@@ -24,9 +25,7 @@ namespace game {
 
         components::Health*     health();
         components::Mana*       mana();
-        components::Strength*   strength();
-        components::Agility*    agility();
-        components::Intellect*  intellect();
+        components::BaseStats*  stats();
         components::BaseDamage* baseDamage();
         components::Position*   position();
         components::Team*       team();

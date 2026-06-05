@@ -5,6 +5,7 @@
 #include "game/systems/UnitMovementSystem.hpp"
 #include "game/systems/UnitTargetSystem.hpp"
 #include "game/systems/UnitSpawnSystem.hpp"
+#include "game/systems/UnitAttackSystem.hpp"
 
 #include <iostream>
 #include <string>
@@ -28,7 +29,8 @@ int main() {
 
     systemRegistry.addUpdate(
         std::make_unique<UnitTargetSystem>(grid),
-        std::make_unique<UnitMovementSystem>(grid)
+        std::make_unique<UnitMovementSystem>(grid),
+        std::make_unique<UnitAttackSystem>()
     );
 
     systemRegistry.initializeAll(context);

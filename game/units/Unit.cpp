@@ -25,24 +25,16 @@ namespace game {
         return _ctx.getComponent<components::Mana>(_entity);
     }
 
-    components::Strength* Unit::strength() {
-        return _ctx.getComponent<components::Strength>(_entity);
-    }
-
-    components::Agility* Unit::agility() {
-        return _ctx.getComponent<components::Agility>(_entity);
-    }
-
-    components::Intellect* Unit::intellect() {
-        return _ctx.getComponent<components::Intellect>(_entity);
-    }
-
     components::BaseDamage* Unit::baseDamage() {
         return _ctx.getComponent<components::BaseDamage>(_entity);
     }
 
     components::Position* Unit::position() {
         return _ctx.getComponent<components::Position>(_entity);
+    }
+
+    components::BaseStats* Unit::stats() {
+        return _ctx.getComponent<components::BaseStats>(_entity);
     }
 
     components::Team* Unit::team() {

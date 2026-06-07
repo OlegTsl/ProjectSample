@@ -25,10 +25,6 @@ namespace game {
         return _ctx.getComponent<components::Mana>(_entity);
     }
 
-    components::BaseDamage* Unit::baseDamage() {
-        return _ctx.getComponent<components::BaseDamage>(_entity);
-    }
-
     components::Position* Unit::position() {
         return _ctx.getComponent<components::Position>(_entity);
     }

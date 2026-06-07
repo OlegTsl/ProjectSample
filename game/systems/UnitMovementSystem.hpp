@@ -12,7 +12,11 @@ namespace game::systems {
         void update(core::Context& context, float dt) override;
 
     private:
-        std::optional<Vec2> getMovePosition(const Vec2& from, const Vec2& to, int range) const;
+        static std::optional<Vec2> getMovePosition(
+            const Grid& grid,
+            const Vec2& from,
+            const Vec2& to,
+            int         range);
 
         Grid& _grid;
     };

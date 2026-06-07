@@ -11,7 +11,6 @@ namespace game::components {
     struct Strength;
     struct Agility;
     struct Intellect;
-    struct BaseDamage;
     struct Position;
     struct Team;
 }
@@ -26,7 +25,6 @@ namespace game {
         components::Health*     health();
         components::Mana*       mana();
         components::BaseStats*  stats();
-        components::BaseDamage* baseDamage();
         components::Position*   position();
         components::Team*       team();
 

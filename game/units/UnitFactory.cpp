@@ -5,6 +5,7 @@
 #include "game/components/Transform.hpp"
 #include "game/components/Combat.hpp"
 #include "game/stats/Stats.hpp"
+#include "game/skills/SkillFactory.hpp"
 
 namespace game {
     UnitFactory::UnitFactory(core::Context& context, UnitRegistry& registry)
@@ -26,13 +27,14 @@ namespace game {
         stats.setBase(stats::StatType::CritDamage, 150);
 
         auto entity = _context.createEntity(
-            components::Name       {"Aragorn"},
-            components::Team       {team},
-            components::Health     {120, 120},
-            components::BaseDamage {12},
-            components::MeleeAttack{stats::StatType::Strength},
-            components::BaseStats  {stats},
-            components::Position   {pos}
+            components::Name             {"Aragorn"},
+            components::Team             {team},
+            components::Health           {120, 120},
+            components::DamageMultiplier {1.0f},
+            components::MeleeAttack      {stats::StatType::Strength},
+            components::BaseStats        {stats},
+            components::Position         {pos},
+            skills::SkillFactory::makeWarriorRage()
         );
 
         return registerUnit(entity);
@@ -48,15 +50,16 @@ namespace game {
         stats.setBase(stats::StatType::CritDamage,175);
 
         auto entity = _context.createEntity(
-            components::Name        {"Legolas"},
-            components::Team        {team},
-            components::Health      {80, 80},
-            components::BaseDamage  {15},
-            components::AttackRange {4},
-            components::MeleeAttack {stats::StatType::Strength},
-            components::RangedAttack{stats::StatType::Agility},
-            components::BaseStats   {stats},
-            components::Position    {pos}
+            components::Name             {"Legolas"},
+            components::Team             {team},
+            components::Health           {80, 80},
+            components::DamageMultiplier {1.0f},
+            components::AttackRange      {4},
+            components::MeleeAttack      {stats::StatType::Strength},
+            components::RangedAttack     {stats::StatType::Agility},
+            components::BaseStats        {stats},
+            components::Position         {pos},
+            skills::SkillFactory::makeArcherPrecisionShot()
         );
 
         return registerUnit(entity);
@@ -72,15 +75,16 @@ namespace game {
         stats.setBase(stats::StatType::CritDamage,200);
 
         auto entity = _context.createEntity(
-            components::Name        {"Gendalf"},
-            components::Team        {team},
-            components::Health      {60, 60},
-            components::Mana        {100, 100},
-            components::BaseDamage  {20},
-            components::AttackRange {3},
-            components::RangedAttack{stats::StatType::Intellect},
-            components::BaseStats   {stats},
-            components::Position    {pos}
+            components::Name             {"Gendalf"},
+            components::Team             {team},
+            components::Health           {60, 60},
+            components::Mana             {100, 100},
+            components::DamageMultiplier {1.0f},
+            components::AttackRange      {3},
+            components::RangedAttack     {stats::StatType::Intellect},
+            components::BaseStats        {stats},
+            components::Position         {pos},
+            skills::SkillFactory::makeMageFireblast()
         );
 
         return registerUnit(entity);

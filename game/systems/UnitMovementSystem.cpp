@@ -31,7 +31,7 @@ namespace game::systems {
                 Vec2 to   = targetPos->value;
 
                 auto* range  = context.getComponent<components::AttackRange>(entity);
-                auto movePos = getMovePosition(from, to, range ? range->value : 1);
+                auto movePos = getMovePosition(_grid, from, to, range ? range->value : 1);
 
                 if (!movePos.has_value())
                     continue;
@@ -51,7 +51,11 @@ namespace game::systems {
         }
     }
 
-    std::optional<Vec2> UnitMovementSystem::getMovePosition(const Vec2& from, const Vec2& to, int range) const
+    std::optional<Vec2> UnitMovementSystem::getMovePosition(
+        const Grid& grid,
+        const Vec2& from,
+        const Vec2& to,
+        int         range)
     {
         if (from.distance(to) <= range)
             return std::nullopt;
@@ -61,7 +65,7 @@ namespace game::systems {
 
         for (const auto& dir : Grid::DIRECTIONS) {
             Vec2 next{from.x + dir.x, from.y + dir.y};
-            if (!_grid.isFree(next))
+            if (!grid.isFree(next))
                 continue;
 
             int dist = next.distance(to);

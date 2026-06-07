@@ -5,4 +5,4 @@
 namespace game::components
 {
     struct BaseStats { stats::Stats stats; };
-}
+} // namespace game::components

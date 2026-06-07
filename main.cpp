@@ -7,6 +7,8 @@
 #include "game/systems/UnitSpawnSystem.hpp"
 #include "game/systems/UnitAttackSystem.hpp"
 #include "game/systems/UnitDeathSystem.hpp"
+#include "game/systems/UnitSkillSystem.hpp"
+#include "game/systems/UnitDamageSystem.hpp"
 
 #include <iostream>
 #include <string>
@@ -45,8 +47,10 @@ int main() {
 
     systemRegistry.addUpdate(
         std::make_unique<UnitTargetSystem>(grid),
-        std::make_unique<UnitMovementSystem>(grid),
+        std::make_unique<UnitSkillSystem>(),
         std::make_unique<UnitAttackSystem>(),
+        std::make_unique<UnitDamageSystem>(),
+        std::make_unique<UnitMovementSystem>(grid),
         std::make_unique<UnitDeathSystem>(grid)
     );
 

@@ -2,13 +2,13 @@
 
 namespace game::core {
 
-    void SystemRegistry::initializeAll(Context& context) {
+    void SystemRegistry::initializeAll(Context& context) const {
         for (auto& system : _initSystems) {
             system->initialize(context);
         }
     }
 
-    void SystemRegistry::updateAll(Context& context, float dt) {
+    void SystemRegistry::updateAll(Context& context, float dt) const {
         for (auto& system : _updateSystems) {
             system->update(context, dt);
         }

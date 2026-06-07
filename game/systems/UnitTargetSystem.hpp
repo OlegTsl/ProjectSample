@@ -11,7 +11,7 @@ namespace game::systems {
     class UnitTargetSystem : public core::UpdateSystem {
     public:
         explicit UnitTargetSystem(const Grid& grid);
-        void update(core::Context& ctx, float dt) override;
+        void update(core::Context& context, float dt) override;
 
     private:
         const Grid& _grid;

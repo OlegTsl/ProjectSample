@@ -5,4 +5,4 @@
 namespace game::components
 {
     struct Position { tools::Vec2 value; };
-}
+} // namespace game::components

@@ -20,10 +20,16 @@ namespace game::systems {
             const components::Target&   target
         );
 
-        static int resolveAttack(
+        static int calculateDamage(
             core::Context&  context,
             core::Entity    entity,
             stats::StatType stat
+        );
+
+        static void applyDamage(
+            core::Context& context,
+            core::Entity   entity,
+            int            damage
         );
 
         static int applyCrit(

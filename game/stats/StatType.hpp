@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace game::stats {
 
     enum class StatType : uint8_t {

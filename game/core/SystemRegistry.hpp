@@ -33,8 +33,8 @@ namespace game::core {
             (_updateSystems.push_back(std::move(systems)), ...);
         }
 
-        void initializeAll(Context& context);
-        void updateAll(Context& context, float dt);
+        void initializeAll(Context& context)       const;
+        void updateAll(Context& context, float dt) const;
 
         void clear();
 

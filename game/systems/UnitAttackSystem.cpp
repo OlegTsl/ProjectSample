@@ -1,6 +1,6 @@
 #include "UnitAttackSystem.hpp"
 
-#include "game/components/Resources.hpp"
+#include "game/components/Skills.hpp"
 #include "game/components/Identity.hpp"
 
 #include <iostream>
@@ -25,18 +25,32 @@ namespace game::systems {
         }
     }
 
-    int UnitAttackSystem::resolveAttack(
+    int UnitAttackSystem::calculateDamage(
         core::Context&  context,
         core::Entity    entity,
         stats::StatType stat)
     {
-        auto* stats  = context.getComponent<components::BaseStats>(entity);
-        auto* damage = context.getComponent<components::BaseDamage>(entity);
+        auto* stats      = context.getComponent<components::BaseStats>(entity);
+        auto* modifier   = context.getComponent<components::StatModifier>(entity);
+        auto* damageMult = context.getComponent<components::DamageMultiplier>(entity);
 
-        int statValue   = stats  ? stats->stats.value(stat) : 0;
-        int damageValue = damage ? damage->value            : 0;
+        auto statValue = stats ? stats->stats.value(stat) : 0;
+        auto statMult  = (modifier && modifier->stat == stat) ? modifier->multiplier : 1.0f;
+        auto multValue = damageMult ? damageMult->value : 1.0f;
 
-        return statValue + damageValue;
+        return static_cast<int>(statValue * statMult * multValue);
+    }
+
+    void UnitAttackSystem::applyDamage(
+        core::Context& context,
+        core::Entity   entity,
+        int            damage)
+    {
+        auto* incomingDamage = context.getComponent<components::Damage>(entity);
+        if (!incomingDamage)
+            incomingDamage = context.addComponent<components::Damage>(entity, {});
+
+        incomingDamage->value += damage;
     }
 
     int UnitAttackSystem::applyCrit(
@@ -69,10 +83,11 @@ namespace game::systems {
         const components::Position& position,
         const components::Target&   target)
     {
-        auto* targetPosition = context.getComponent<components::Position>(target.entity);
-        auto* targetHealth   = context.getComponent<components::Health>(target.entity);
+        if (context.hasComponent<components::SkillUsed>(entity))
+            return;
 
-        if (!targetPosition || !targetHealth)
+        auto* targetPosition = context.getComponent<components::Position>(target.entity);
+        if (!targetPosition)
             return;
 
         int distance = position.value.distance(targetPosition->value);
@@ -83,28 +98,26 @@ namespace game::systems {
         int damage = 0;
 
         if (distance == 1 && melee) {
-            damage = resolveAttack(context, entity, melee->stat);
+            damage = calculateDamage(context, entity, melee->stat);
         } else if (distance > 1 && ranged) {
             auto* range = context.getComponent<components::AttackRange>(entity);
             if (!range || distance > range->value)
                 return;
 
-            damage = resolveAttack(context, entity, ranged->stat);
+            damage = calculateDamage(context, entity, ranged->stat);
         } else {
             return;
         }
 
         damage = applyCrit(context, entity, damage);
-        targetHealth->current -= damage;
+        applyDamage(context, target.entity, damage);
 
         auto* entityName = context.getComponent<components::Name>(entity);
         auto* targetName = context.getComponent<components::Name>(target.entity);
 
         std::cout << "[Attack] entity(" << entityName->value << ")"
                   << " hits entity(" << targetName->value << ")"
-                  << " for " << damage << " dmg"
-                  << " | HP: " << targetHealth->current
-                  << "/" << targetHealth->max << "\n";
+                  << " for " << damage << " dmg\n";
     }
 
 } // namespace game::systems

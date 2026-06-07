@@ -1,79 +1,98 @@
 #pragma once
 
-#include <vector>
-#include <unordered_map>
-#include <cassert>
 #include "Entity.hpp"
+
+#include <vector>
+#include <cassert>
+#include <limits>
 
 namespace game::core {
 
-template<typename T>
-class ComponentPool {
-public:
-    T* add(Entity entity, T&& component) {
-        assert(!has(entity));
-        
-        size_t index = _data.size();
-        _data.push_back(std::forward<T>(component));
-        _entities.push_back(entity);
-        _entityToIndex[entity.id] = index;
+    template<typename T>
+    class ComponentPool {
+    public:
+        static constexpr size_t INVALID = std::numeric_limits<size_t>::max();
 
-        return &_data.back();
-    }
-    
-    void remove(Entity entity) {
-        assert(has(entity));
-        
-        size_t index     = _entityToIndex[entity.id];
-        size_t lastIndex = _data.size() - 1;
-        
-        if (index != lastIndex) {
-            std::swap(_data[index],     _data[lastIndex]);
-            std::swap(_entities[index], _entities[lastIndex]);
-            _entityToIndex[_entities[index].id] = index;
+        T* add(Entity entity, T&& component) {
+            assert(!has(entity));
+
+            ensureCapacity(entity.id);
+
+            size_t index = _data.size();
+            _data.push_back(std::forward<T>(component));
+            _entities.push_back(entity);
+            _entityToIndex[entity.id] = index;
+
+            return &_data.back();
         }
-        
-        _data.pop_back();
-        _entities.pop_back();
-        _entityToIndex.erase(entity.id);
-    }
-    
-    T* get(Entity entity) {
-        auto it = _entityToIndex.find(entity.id);
-        if (it != _entityToIndex.end()) {
-            return &_data[it->second];
+
+        void remove(Entity entity) {
+            assert(has(entity));
+
+            size_t index     = _entityToIndex[entity.id];
+            size_t lastIndex = _data.size() - 1;
+
+            if (index != lastIndex) {
+                std::swap(_data[index],     _data[lastIndex]);
+                std::swap(_entities[index], _entities[lastIndex]);
+                _entityToIndex[_entities[index].id] = index;
+            }
+
+            _data.pop_back();
+            _entities.pop_back();
+            _entityToIndex[entity.id] = INVALID;
         }
-        return nullptr;
-    }
-    
-    const T* get(Entity entity) const {
-        auto it = _entityToIndex.find(entity.id);
-        if (it != _entityToIndex.end()) {
-            return &_data[it->second];
+
+        T* get(Entity entity) {
+            if (entity.id >= _entityToIndex.size())
+                return nullptr;
+
+            size_t index = _entityToIndex[entity.id];
+            if (index == INVALID)
+                return nullptr;
+
+            return &_data[index];
         }
-        return nullptr;
-    }
-    
-    bool has(Entity entity) const {
-        return _entityToIndex.find(entity.id) != _entityToIndex.end();
-    }
-    
-    size_t size() const {
-        return _data.size();
-    }
-    
-    const std::vector<T>& data() const {
-        return _data;
-    }
-    
-    const std::vector<Entity>& entities() const {
-        return _entities;
-    }
-    
-private:
-    std::vector<T>                       _data;
-    std::vector<Entity>                  _entities;
-    std::unordered_map<uint32_t, size_t> _entityToIndex;
-};
+
+        const T* get(Entity entity) const {
+            if (entity.id >= _entityToIndex.size())
+                return nullptr;
+
+            size_t index = _entityToIndex[entity.id];
+            if (index == INVALID)
+                return nullptr;
+
+            return &_data[index];
+        }
+
+        bool has(Entity entity) const {
+            if (entity.id >= _entityToIndex.size())
+                return false;
+
+            return _entityToIndex[entity.id] != INVALID;
+        }
+
+        size_t size() const {
+            return _data.size();
+        }
+
+        const std::vector<T>& data() const {
+            return _data;
+        }
+
+        const std::vector<Entity>& entities() const {
+            return _entities;
+        }
+
+    private:
+        std::vector<T>      _data;
+        std::vector<Entity> _entities;
+        std::vector<size_t> _entityToIndex;
+
+        void ensureCapacity(uint32_t id) {
+            if (id >= _entityToIndex.size())
+                _entityToIndex.resize(id + 1, INVALID);
+        }
+    };
 
 } // namespace game::core
